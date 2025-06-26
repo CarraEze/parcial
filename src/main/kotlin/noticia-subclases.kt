@@ -2,6 +2,7 @@ import java.time.LocalDate
 
 abstract class Noticia(
     val tipo : String,
+    val periodista : Periodista,
     val fechaEscrita: String,
     val importancia: Double,
     val titulo : String,
