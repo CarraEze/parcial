@@ -1,15 +1,20 @@
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 abstract class Noticia(
     val tipo : String,
-    val fechaEscrita: String,
+    val periodista: Periodista,
+    val fechaEscritura: LocalDate,
     val importancia: Double,
     val titulo : String,
     val desarrollo : String){
 
     fun esCopada() = esCopadaBase() and esCopadaPart()
-    fun esCopadaBase() = importancia>= 8.0 and (LocalDate.daysBetween(fechaEscritura, LocalDate.now())< 3)
+    fun esCopadaBase() = importancia>= 8.0 && (ChronoUnit.DAYS.between(fechaEscritura, LocalDate.now())< 3)
     abstract fun esCopadaPart(): Boolean
+
+    open fun cumpleSensacionalista(listaPalabras : List<String>):Boolean =
+        listaPalabras.any{desarrollo.contains(it)}
 
     fun contiene(palabra : String) = desarrollo.contains(palabra)
 
@@ -17,7 +22,7 @@ abstract class Noticia(
 
     fun autorLaPrefiere() = periodista.loPrefiere(this)
 
-    fun esGrande() = desarrollo.size() > 1000
+    fun esGrande() = desarrollo.split("").size > 1000
 }
 
 class Chivo(
@@ -26,34 +31,38 @@ class Chivo(
     periodista : Periodista,
     importancia: Double,
     tipo: String,
+    titulo: String,
     desarrollo : String
-    ) : Noticia(fechaEscritura, periodista, importancia, tipo, desarrollo){
+    ) : Noticia( tipo,  periodista, fechaEscritura, importancia, titulo, desarrollo){
         override fun esCopadaPart() = plataPagada > 200000.0
+
     }
 
 class Reportaje(
     val entrevistado : String,
-    tipo : String,
     val seDedicaAMusica : Boolean,
+    fechaEscritura : LocalDate,
     periodista : Periodista,
-    importancia : Double,
-    titulo : String,
-    desarrollo : String,
-    fechaEscrita: LocalDate
-    ): Noticia(fechaEscrita, tipo, periodista, importancia, titulo, desarrollo)
-{
-    override fun esCopadaPart() = entrevistado.size() == 25
+    importancia: Double,
+    tipo: String,
+    titulo: String,
+    desarrollo : String
+) : Noticia( tipo,  periodista, fechaEscritura, importancia, titulo, desarrollo){
+    override fun esCopadaPart() = entrevistado.length == 25
+
+    override fun cumpleSensacionalista(listaPalabras: List<String>): Boolean{
+        return super.cumpleSensacionalista(listaPalabras) && entrevistado == "Dibu Martinez"
+    }
 }
 
 class ArticuloComun(
     var listaLinks : List<String>,
-    fechaEscrita: LocalDate,
-    periodista, Periodista,
-    tipo: String,
+    fechaEscritura : LocalDate,
+    periodista : Periodista,
     importancia: Double,
-    titulo : String,
-    desarrollo: String): Noticia(fechaEscritura, periodista, importancia, titulo, desarrollo, tipo){
-
+    tipo: String,
+    titulo: String,
+    desarrollo : String
+) : Noticia( tipo,  periodista, fechaEscritura, importancia, titulo, desarrollo){
         override fun esCopadaPart() = listaLinks.size >= 2
-
     }

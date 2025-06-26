@@ -5,7 +5,7 @@ class Periodista (val nombre : String, val fechaIngreso : LocalDate){
 
     fun loPrefiere(noticia: Noticia) = preferencia.seCumple(noticia)
 
-    fun recibirPago(monto : Double) = TODO()
+    fun recibirPago(monto : Double){}
 
     fun cambiarPreferencia(preferenciaN : Preferencia) {
         preferencia = preferenciaN
@@ -16,25 +16,19 @@ interface Preferencia{
     fun seCumple(noticia : Noticia): Boolean
 }
 
-object noticiasCopadas(): Preferencia{
-    override fun seCumple(noticia: Noticia) = noticia.esCopada()
+object noticiasCopadas: Preferencia{
+    override fun seCumple(noticia: Noticia): Boolean = noticia.esCopada()
 }
 
-object NoticiasSencacionalistas() : Preferencia{
-    var palabrasSensacionales : List<String> = ("espectacular", "increible", "grandioso")
+class NoticiasSencacionalistas : Preferencia{
+    var palabrasSensacionales : List<String> = mutableListOf("espectacular", "increible", "grandioso")
 
-    override fun seCumple(noticia: Noticia) {
-        if(noticia.tipo == reportaje){
-            return palabrasSensacionales.any{noticia.contiene(it)} and noticias.entrevistado == "Dibu Martinez"
-        }
-        else{
-            return palabrasSensacionales.any{noticia.contiene(it)}
-        }
-    }
+    override fun seCumple(noticia: Noticia) : Boolean =
+        noticia.cumpleSensacionalista(palabrasSensacionales)
 }
 
 object comienzaConT : Preferencia{
-    override fun seCumple(noticia: Noticia){
-        return noticia.tituloEmpiezaCon("t")
+    override fun seCumple(noticia: Noticia): Boolean{
+        return noticia.tituloEmpiezaCon('t')
     }
 }
